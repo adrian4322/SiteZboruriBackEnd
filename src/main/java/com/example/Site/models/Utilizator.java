@@ -11,27 +11,23 @@ import lombok.experimental.SuperBuilder;
 public class Utilizator {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false, length = 100, unique = true)
-    private String name;
+    private String username;
 
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
-    private String password;
+    @Column(nullable = false)
+    private String parola;
 
-    public Utilizator(long id, String name, String email, String password) {
-        this.id = id;
-        this.name = name;
+    public Utilizator(String username, String email, String parola) {
+        this.username = username;
         this.email = email;
-        this.password = password;
+        this.parola = parola;
     }
 
     public Utilizator() {}
-
-
-
 }

@@ -2,7 +2,6 @@ package com.example.Site;
 
 import com.example.Site.models.Utilizator;
 import com.example.Site.models.UtilizatorService;
-import com.example.Site.repositories.UtilizatorRepository;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -21,16 +20,16 @@ public class SiteApplication {
 		return new BCryptPasswordEncoder();
 	}
 
-	@Bean
+	/*@Bean
 	public CommandLineRunner commandLineRunner(UtilizatorService utilizatorService) {
 		return args -> {
 			var utilizator = Utilizator.builder()
-					.name("adrian")
-					.password("adrian4322")
+					.username("adrian")
+					.parola("adrian4322")
 					.email("adrian@gmail.com")
 					.build();
 			utilizatorService.saveUtilizator(utilizator);
 		};
-	}
+	}*/
 
 }

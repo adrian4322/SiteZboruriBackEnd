@@ -15,11 +15,11 @@ public class UtilizatorService {
         this.utilizatorRepository = utilizatorRepository;
     }
 
-    public Utilizator saveUtilizator(Utilizator utilizator) {
-        String hashedPassword = passwordEncoder.encode(utilizator.getPassword());
-        utilizator.setPassword(hashedPassword);
+    public void saveUtilizator(Utilizator utilizator) {
+        String hashedPassword = passwordEncoder.encode(utilizator.getParola());
+        utilizator.setParola(hashedPassword);
 
-        return utilizatorRepository.save(utilizator);
+        utilizatorRepository.save(utilizator);
     }
 
 
