@@ -1,6 +1,7 @@
 package com.example.Site.models;
 
 import com.example.Site.repositories.UtilizatorRepository;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +10,7 @@ public class UtilizatorService {
 
     private final BCryptPasswordEncoder passwordEncoder;
     private final UtilizatorRepository utilizatorRepository;
+
 
     public UtilizatorService(BCryptPasswordEncoder passwordEncoder, UtilizatorRepository utilizatorRepository){
         this.passwordEncoder = passwordEncoder;

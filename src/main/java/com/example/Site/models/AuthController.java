@@ -1,7 +1,10 @@
 package com.example.Site.models;
 
 import com.example.Site.repositories.UtilizatorRepository;
+
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -11,10 +14,38 @@ public class AuthController {
 
     private final UtilizatorService utilizatorService;
     private final UtilizatorRepository utilizatorRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final HttpSession session;
 
-    public AuthController(UtilizatorService utilizatorService, UtilizatorRepository utilizatorRepository) {
+    public AuthController(UtilizatorService utilizatorService,
+                          UtilizatorRepository utilizatorRepository,
+                          BCryptPasswordEncoder passwordEncoder,
+                          HttpSession session) {
         this.utilizatorService = utilizatorService;
         this.utilizatorRepository = utilizatorRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.session = session;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> logareUtilizator(@RequestBody LogareRequest logareRequest, HttpSession session) {
+        Utilizator utilizator = utilizatorRepository.findByUsername(logareRequest.getUsername());
+
+        if (utilizator == null || !passwordEncoder.matches(logareRequest.getPassword(), utilizator.getParola())) {
+            return ResponseEntity.status(401).body("eroare: Nume de utilizator sau parola gresite!");
+        }
+
+        session.setAttribute("utilizator", utilizator);
+
+        return ResponseEntity.ok("Logare reusita!");
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpSession session) {
+
+        session.invalidate();
+        return ResponseEntity.ok("Logout reusit!");
     }
 
     @PostMapping("/creareCont")
