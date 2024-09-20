@@ -1,8 +1,10 @@
 package com.example.Site.models;
 
 import com.example.Site.repositories.UtilizatorRepository;
-
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -20,32 +23,41 @@ public class AuthController {
     private final UtilizatorRepository utilizatorRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final HttpSession session;
+    private final String secretKey;
 
     public AuthController(UtilizatorService utilizatorService,
                           UtilizatorRepository utilizatorRepository,
                           BCryptPasswordEncoder passwordEncoder,
-                          HttpSession session) {
+                          HttpSession session,
+                          @Qualifier("cheie") String secretKey) {
         this.utilizatorService = utilizatorService;
         this.utilizatorRepository = utilizatorRepository;
         this.passwordEncoder = passwordEncoder;
         this.session = session;
+        this.secretKey = secretKey;
     }
 
-    @PostMapping("/login")
+    @PostMapping("/logare")
     public ResponseEntity<Map<String, String>> logareUtilizator(@RequestBody LogareRequest logareRequest, HttpSession session) {
         Utilizator utilizator = utilizatorRepository.findByUsername(logareRequest.getUsername());
         Map<String, String> raspuns = new HashMap<>();
-
-        System.out.println(logareRequest.getUsername() + " / " +  logareRequest.getPassword());
 
         if (utilizator == null || !passwordEncoder.matches(logareRequest.getPassword(), utilizator.getParola())) {
             raspuns.put("eroare", "Nume de utilizator sau parola gresite!");
             return ResponseEntity.status(401).body(raspuns);
         }
 
+        String token = Jwts.builder()
+                .setSubject(utilizator.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+
         session.setAttribute("utilizator", utilizator);
 
         raspuns.put("Succes", " Logarea a fost cu succes!");
+        raspuns.put("token", token);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .body(raspuns);
@@ -72,7 +84,7 @@ public class AuthController {
         }
 
         if (utilizatorRepository.existsByEmail(creareContRequest.getEmail())) {
-            response.put("eroare", " Email-ul este luat!");
+            response.put("eroare", "Email-ul este luat!");
             return ResponseEntity
                     .badRequest()
                     .header(HttpHeaders.CONTENT_TYPE, "application/json")

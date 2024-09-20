@@ -1,0 +1,28 @@
+services:
+  db:
+    ports:
+      - 5432:5432
+    image: postgres
+    container_name: bazaDeDate
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: Utilizatori
+  backend:
+    build: .
+    container_name: backend
+    image: springio/gs-spring-boot-docker
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/Utilizatori
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+    depends_on:
+      - db
+    ports:
+      - 8080:8080
+  frontend:
+    build: D:/SiteZboruriBackEnd/Dockerfile  
+    image: img_angular
+    container_name: fronteEndAngular
+    ports:
+      - 4200:4200 
